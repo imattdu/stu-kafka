@@ -1,4 +1,4 @@
-package com.matt.kafka.partitioner;
+package com.matt.kafka.producer.partitioner;
 
 import org.apache.kafka.clients.producer.*;
 
@@ -28,8 +28,8 @@ public class PartitionProducer {
 
 
         //分区器
-        // com.matt.kafka.partitioner.MyPartitioner
-        properties.put("partitioner.class", "com.matt.kafka.partitioner.MyPartitioner");
+        // com.matt.kafka.producer.partitioner.MyPartitioner
+        properties.put("partitioner.class", "com.matt.kafka.producer.partitioner.MyPartitioner");
 
         // 序列化
         properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");

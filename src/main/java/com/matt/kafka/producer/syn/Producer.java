@@ -1,18 +1,19 @@
-package com.matt.kafka;
+package com.matt.kafka.producer.syn;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.*;
 
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 /**
+ * 同步
  * @author matt
- * @create 2021-07-21 0:57
+ * @create 2021-07-23 0:43
  */
-public class CustomProducer {
+public class Producer {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
 
         Properties properties = new Properties();
         //kafka 集群，broker-list
@@ -27,7 +28,6 @@ public class CustomProducer {
         properties.put("linger.ms", 1);
         //RecordAccumulator 缓冲区大小
         properties.put("buffer.memory", 33554432);
-
         // 序列化
         properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
         properties.put("value.serializer",
@@ -36,9 +36,18 @@ public class CustomProducer {
 
         KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
 
+        for (int i = 0; i < 9; i++) {
+            Future<RecordMetadata> future = producer.send(new ProducerRecord<String, String>("first", "cc" + i),
+                    new Callback() {
+                        @Override
+                        public void onCompletion(RecordMetadata recordMetadata, Exception e) {
+                            System.out.println(recordMetadata.toString());
+                            System.out.println("----------");
+                        }
+                    });
 
-        for (int i = 0; i < 55; i++) {
-            producer.send(new ProducerRecord<String, String>("first","cc" + i));
+            // 会阻塞
+            //RecordMetadata recordMetadata = future.get();
         }
         // 记得关闭资源
         producer.close();
